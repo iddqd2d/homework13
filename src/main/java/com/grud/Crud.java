@@ -8,12 +8,9 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Grud {
-
-
-    public abstract List readAllData();
-    public abstract int deleteDataById(Integer id);
-
+public abstract class Crud <T> {
+    public abstract List<T> findAll();
+    public abstract boolean deleteDataById(Integer id);
 
     @SneakyThrows
     public void close(Statement statement) {

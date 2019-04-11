@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevelopersGrud extends Grud {
+public class DevelopersCrud extends Crud <Developer> {
     private static final String ADD_NEW_DEVELOPER_SQL_QUERY = "INSERT INTO `developers` VALUES(NULL,? ,? ,? ,? );";
     private static final String READ_ALL_DATA_SQL_QUERY = "SELECT * FROM `developers`;";
     private static final String DELETE_BY_ID_SQL_QUERY = "DELETE FROM `developers` WHERE `id` = ?;";
@@ -31,18 +31,16 @@ public class DevelopersGrud extends Grud {
 
     @SneakyThrows
     @Override
-    public List readAllData() {
-        List<String> list = new ArrayList();
+    public List<Developer> findAll() {
+        List<Developer> list = new ArrayList();
         Connection connection = ConnectionDb.getConnection();
         Statement statement = connection.createStatement();
         ResultSet result = statement.executeQuery(READ_ALL_DATA_SQL_QUERY);
         while (result.next()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(result.getString("name")).append("|")
-                    .append(result.getString("age")).append("|")
-                    .append(result.getString("sex")).append("|")
-                    .append(result.getString("salary")).append("|");
-            list.add(stringBuilder.toString());
+            list.add(new Developer().setName(result.getString("name"))
+                    .setAge(result.getInt("age"))
+                    .setSex(result.getBoolean("sex"))
+                    .setSalary(result.getInt("salary")));
         }
         close(statement);
         close(connection);
@@ -51,25 +49,25 @@ public class DevelopersGrud extends Grud {
 
     @SneakyThrows
     @Override
-    public int deleteDataById(Integer id) {
+    public boolean deleteDataById(Integer id) {
         Connection connection = ConnectionDb.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID_SQL_QUERY);
         preparedStatement.setInt(1, id);
-        int rowDeleted = preparedStatement.executeUpdate();
+        boolean isDeleted = preparedStatement.execute();
         close(preparedStatement);
         close(connection);
-        return rowDeleted;
+        return isDeleted;
     }
 
     @SneakyThrows
-    public int updateData(String name, int salary) {
+    public boolean updateData(String name, int salary) {
         Connection connection = ConnectionDb.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(CHANGE_SALARY_DEVELOPER_SQL_QUERY);
         preparedStatement.setInt(1, salary);
         preparedStatement.setString(2, name);
-        int rowUpdated = preparedStatement.executeUpdate();
+        boolean isUpdated = preparedStatement.execute();
         close(preparedStatement);
         close(connection);
-        return rowUpdated;
+        return isUpdated;
     }
 }
